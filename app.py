@@ -29,5 +29,5 @@ def check_card():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Expose the Flask app for Vercel
-handler = app
+# 👇 The ONLY thing Vercel needs:
+app = app  # expose app, no handler()
