@@ -1,19 +1,19 @@
 from flask import Flask, request, jsonify
-from autoshopify import stormxcc  # Make sure this import is correct
+from autoshopify import stormxcc  # Module installed via pip
 
 app = Flask(__name__)
 
 @app.route("/")
-def home():
-    return "✅ Autoshopify API running!"
+def index():
+    return "✅ Autoshopify API is running!"
 
 @app.route("/check", methods=["GET"])
-def check_card():
+def check():
     cc = request.args.get("cc")
     site = request.args.get("site")
     proxy = request.args.get("proxy", "")
-    tries = int(request.args.get("tries", 2))
-    timeout = int(request.args.get("timeout", 120))
+    tries = int(request.args.get("tries", 1))
+    timeout = int(request.args.get("timeout", 30))
 
     if not cc or not site:
         return jsonify({"error": "Missing required parameters: cc and site"}), 400
@@ -27,9 +27,7 @@ def check_card():
             timeout=timeout
         )
 
-        result = {
-            "status_code": resp.status_code,
-        }
+        result = {"status_code": resp.status_code}
 
         try:
             result["response"] = resp.json()
@@ -41,6 +39,6 @@ def check_card():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Required for Vercel Python
+# Required by Vercel for Flask WSGI apps
 def handler(environ, start_response):
     return app(environ, start_response)
